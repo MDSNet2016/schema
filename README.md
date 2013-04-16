@@ -9,7 +9,7 @@ Schema is a small Clojure library that provides a generic data schema structure 
 * Validation of data values.
 * Value conversion between applicaiton and datastore states.
 
-Scheme is intended to be extensible so that plugin-based application can add entities, attributes, and relationships to an existing schema to support the plugin operations.
+Schema is intended to be extensible so that plugin-based application can add entities, attributes, and relationships to an existing schema to support the plugin operations.
 
 ## Usage
 
