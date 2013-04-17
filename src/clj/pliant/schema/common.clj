@@ -21,31 +21,39 @@
 
 
 (defn persistable
-  "Modifies a relation or attribute to be transient when creating the entity."
+  "Modifies a relation or attribute to be persisted when creating the entity."
   [relation]
   (assoc relation :transient false))
 
 
 (defn strict
-  "Modifies a schema or entity to have a fidelity level of :strict."
+  "Modifies a schema or entity to have a fidelity level of :strict, meaning 
+   all data to be persisted or retrieved will be cleaned up to adhere to 
+   the schema."
   [spouse]
   (assoc spouse :fidelity :strict))
 
 
 (defn strict-in
-  "Modifies a schema or entity to have a fidelity level of :strict-in."
+  "Modifies a schema or entity to have a fidelity level of :strict-in, meaning 
+   all data to be persisted will be cleaned up to adhere to the schema, but 
+   data being retrieved is returned as-is."
   [spouse]
   (assoc spouse :fidelity :strict-in))
 
 
 (defn strict-out
-  "Modifies a schema or entity to have a fidelity level of :strict-out."
+  "Modifies a schema or entity to have a fidelity level of :strict-out, meaning 
+   all data to be retrieved will be cleaned up to adhere to the schema, but any 
+   data being persisted will be persisted."
   [spouse]
   (assoc spouse :fidelity :strict-out))
 
 
 (defn drunk
-  "Modifies a schema or entity to have a fidelity level of :drunk."
+  "Modifies a schema or entity to have a fidelity level of :drunk, meaning 
+   the rules of structure and validation of the schema will not be applied
+   to data being persisted or retrieved."
   [spouse]
   (assoc spouse :fidelity :drunk))
 

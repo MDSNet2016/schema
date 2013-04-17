@@ -13,8 +13,8 @@
 
 
 (defmulti attribute-name
-  "Returns the name of the attribute the data of the relationship is stored in.  
-   By default, if a value is provided in the :name property that value is returned,
+  "Returns the name of the attribute the data of the relationship is stored in.  By 
+   default, if a value is provided in the :name property that value is returned,
    else the :related-to value is returned.
    
    To modify how the attribute-name function provides the relevant attribute name, 

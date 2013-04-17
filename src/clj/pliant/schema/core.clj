@@ -1,16 +1,20 @@
 (ns pliant.schema.core
+  "Provides the building blocks for creating a Schema."
   (:require [pliant.schema.attributes :as attrs]
             [pliant.schema.common :as common]
             [pliant.schema.entity :as ent]
             [pliant.schema.relations :as rels]))
 
-  
+
 (defn check-fidelity
   "Ensures that the fidelity level is one of the following:
-     :strict - all data must comply to schema
-     :strict-in - all data must comply to schema only when persisted
-     :strict-out - only data that complies with the schema is returned when retrieved
-     :drunk - all data is persisted and retrieved, whether it complies to the schema or not
+
+   + :strict - all data must comply to schema
+   + :strict-in - all data must comply to schema only when persisted
+   + :strict-out - only data that complies with the schema is returned when retrieved
+   + :drunk - all data is persisted and retrieved, whether it complies to the schema or not
+
+
    Returns the fidelity value passed if it is an acceptable fidelity level, else :strict is returned."
   [fidelity]
   (if (and (not (nil? fidelity)) (contains? #{:strict :strict-in :strict-out :drunk} fidelity))

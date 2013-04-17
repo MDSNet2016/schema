@@ -10,5 +10,9 @@
   
   ;; Keep java source and project definition out of the artifact
   :jar-exclusions [#"^\." #"^*\/\." #"\.java$" #"project\.clj"]
+  
+  ;; To Run Marginalia us lein marg -d doc/api -m
+  :plugins [[lein-marginalia "0.7.1"]]
+  :aliases {"doc" ["marg" "-d" "doc/api" "-m"]}
 
   :dependencies [[org.clojure/clojure "1.3.0"]])

@@ -1,4 +1,6 @@
-(ns pliant.schema.attributes)
+(ns pliant.schema.attributes
+  "Provides functions for working with an entity's attributes map and individual 
+   attribute properties.")
 
 (defn only-transient
   "Filters out any entity attributes that are not transient."
