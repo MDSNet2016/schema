@@ -62,6 +62,13 @@
                 (throw (UnsupportedOperationException. "Can not merge collections of relations where there is overlap in the relation attribute name."))
                 (conj coll rel))) rels1 rels2)))
 
+
+(defn remove-relation
+  "Removes a relation from a relation collection."
+  [relations name]
+  (into [] (filter #(not= name (attribute-name %)) relations)))
+
+
 (defn relationship-name
   "Gets the name that identifies the relationship within the datastore.  Need for graph dbs to name the edges."
   [relation]

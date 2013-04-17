@@ -62,12 +62,20 @@
                  "Provides ability to modify the entire schema structure.  You should not use this unless you 
                   really understand the structure of the schema.")
   (modify-entity [this entity-name modifier-fn] 
-                 "Modifies an entity on the schema. using the modifier function provided.  If the entity 
+                 "Modifies an entity on the schema using the modifier function provided.  If the entity 
                   does not exist an exception will be thrown.")
-  (modify-attribute [this entity-name attribute-name properties] 
-                    "Modifies an attribute to an entity.  If the attribute does not exist, an exception is thrown.")
+  (modify-attribute [this entity-name attribute-name modifier-fn] 
+                    "Modifies an attribute to an entity using the modifier function provided.  
+                    If the attribute does not exist, an exception is thrown.")
   (modify-relation [this entity-name relation-name modifier-fn] 
-                   "Modifies a relation on an entity using the modifier function provided.  If the relation does not exist, an exception is thrown."))
+                   "Modifies a relation on an entity using the modifier function provided.  
+                    If the relation does not exist, an exception is thrown.")
+  (drop-entity [this entity-name] 
+               "Drops an entity on the schema.")
+  (drop-attribute [this entity-name attribute-name] 
+                  "Removes an attribute from an entity.")
+  (drop-relation [this entity-name relation-name] 
+                 "Removes a relation from an entity."))
 
 (deftype Schema [schema]
   ISchema
@@ -198,7 +206,16 @@
                                                                    "' to entity '" entity-name ", as modifier-fn is not a function."
                                                                    "  Stop it.  Just stop it.")))
                        :else
-                       (swap! schema #(update-in % [:entities entity-name :relations index] modifier-fn))))))
+                       (swap! schema #(update-in % [:entities entity-name :relations index] modifier-fn)))))
+  (drop-entity [this entity-name] 
+               (if (entity this entity-name)
+                 (swap! schema #(update-in % [:entities] (fn [m] (dissoc m entity-name))))))
+  (drop-attribute [this entity-name attribute-name]
+                  (if (get-in (attributes this entity-name) [attribute-name])
+                    (swap! schema #(update-in % [:entities entity-name :attributes] (fn [m] (dissoc m attribute-name))))))
+  (drop-relation [this entity-name relation-name]
+                 (if (rels/find-relation (relations this entity-name) relation-name)
+                   (swap! schema #(update-in % [:entities entity-name :relations] (fn [coll] (rels/remove-relation coll relation-name)))))))
 
 
 (defn create-schema

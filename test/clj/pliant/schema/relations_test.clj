@@ -83,8 +83,9 @@
     (is (= 1 (find-relation-index rels :states)))
     (is (= 2 (find-relation-index rels :roles)))))
 
-
 (deftest test-merge-relations
-  (is (fn? merge-relations))
   (is (thrown? UnsupportedOperationException (merge-relations [belongs-to1] [belongs-to1])))
   (is (= 2 (count (merge-relations [belongs-to1] [belongs-to2])))))
+
+(deftest test-remove-relations
+  (is (= 1 (count (remove-relation [belongs-to1 belongs-to2] :target)))))

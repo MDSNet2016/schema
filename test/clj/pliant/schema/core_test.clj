@@ -223,6 +223,11 @@
     (add-entity schema :newentity {})
     (is (= 5 (count (entities schema))))
     (is (thrown? UnsupportedOperationException (add-entity schema :address {})))
+    ;; Drop Tests
+    (drop-entity schema :newentity)
+    (is (= 4 (count (entities schema))))
+    (drop-entity schema :newentity)
+    (is (= 4 (count (entities schema))))
     ;; Modify Tests
     (is (= :strict (fidelity schema :address)))
     (modify-entity schema :address common/drunk)
@@ -237,7 +242,12 @@
     (is (= 6 (count (attributes schema :person))))
     (add-attribute schema :person :newattribute {})
     (is (= 7 (count (attributes schema :person))))
-    ;; Modify Tests
+    ;; Drop Tests
+    (drop-attribute schema :person :newattribute)
+    (is (= 6 (count (attributes schema :person))))
+    (drop-attribute schema :person :newattribute)
+    (is (= 6 (count (attributes schema :person))))
+   ;; Modify Tests
     (is (thrown? UnsupportedOperationException (modify-attribute schema :newentity :newattribute nil)))
     (is (thrown? UnsupportedOperationException (modify-attribute schema :person :newattribute nil)))
     (is (thrown? UnsupportedOperationException (modify-attribute schema :person :age nil)))
@@ -260,6 +270,11 @@
     (is (= 4 (count (relations schema :person))))
     (add-relation schema :person {:type :belongs-to :related-to :newrel})
     (is (= 5 (count (relations schema :person))))
+    ;; Drop Tests
+    (drop-relation schema :person :newrel)
+    (is (= 4 (count (relations schema :person))))
+    (drop-relation schema :person :newrel)
+    (is (= 4 (count (relations schema :person))))
     ;; Modify Tests
     (is (thrown? UnsupportedOperationException (modify-relation schema :newentity :otherentity nil)))
     (is (thrown? UnsupportedOperationException (modify-relation schema :person :otherentity nil)))
