@@ -79,7 +79,20 @@
   (drop-attribute [this entity-name attribute-name] 
                   "Removes an attribute from an entity.")
   (drop-relation [this entity-name relation-name] 
-                 "Removes a relation from an entity."))
+                 "Removes a relation from an entity.")
+  (adhere [this entity-name data direction]
+          "If the fidelity for the entity is either :strict, or :strict-in when direction is :in or 
+           :strict-out when direction is :out, the data provided will be pruned to adhere to the 
+           scheme and returned, else the data provided will be returned.")
+  (adhere! [this entity-name data direction]
+           "No matter what the fidelity level is for entity indicated, the data provided will be pruned 
+           to adhere to the scheme and returned."))
+
+(defprotocol ISchemaInternals
+  "Defines methods that are not really for extenal consumption.  Any of these methods should not be used 
+   externally unless you really know what your are doing."
+  (adhere- [this entity-name data adhere-fn attr-filter-fn rels-filter-fn]
+           "Provides that actually adherence processing for the adhere and adhere! methods"))
 
 (deftype Schema [schema]
   ISchema
@@ -127,20 +140,20 @@
                     (typed-relation this entity-name :has-many child-entity-name))
     (add-entity [this entity-name properties] 
               (if (entity this entity-name) 
-                (throw (UnsupportedOperationException. (str "Can not add entity '" entity-name " to schema, as entity '"
-                                                            entity-name "' already exists.  Use modify-entity function instead.")))
+                (throw (IllegalArgumentException. (str "Can not add entity '" entity-name " to schema, as entity '"
+                                                       entity-name "' already exists.  Use modify-entity function instead.")))
                 (swap! schema #(assoc-in % [:entities entity-name] properties))))
     (add-attribute [this entity-name attribute-name properties] 
                    (let [entity (entity this entity-name)]
                      (cond
                        (nil? entity)
-                       (throw (UnsupportedOperationException. (str "Unable to add attribute '" attribute-name 
-                                                                   "' to entity '" entity-name ", as entity '" entity-name 
-                                                                   "' does not exist.  Use add-entity function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to add attribute '" attribute-name 
+                                                              "' to entity '" entity-name ", as entity '" entity-name 
+                                                              "' does not exist.  Use add-entity function instead.")))
                        (get-in entity [:attributes attribute-name])
-                       (throw (UnsupportedOperationException. (str "Unable to add attribute '" attribute-name 
-                                                                   "' to entity '" entity-name ", as attribute '" attribute-name 
-                                                                   "' already exists.  Use modify-attribute function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to add attribute '" attribute-name 
+                                                              "' to entity '" entity-name ", as attribute '" attribute-name 
+                                                              "' already exists.  Use modify-attribute function instead.")))
                        :else
                        (swap! schema #(assoc-in % [:entities entity-name :attributes attribute-name] properties)))))
     (add-relation [this entity-name relation] 
@@ -150,18 +163,18 @@
                         all-relation-names (rels/attribute-names (relations this entity-name))]
                     (cond
                        (nil? entity)
-                       (throw (UnsupportedOperationException. (str "Unable to add relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as entity '" entity-name 
-                                                                   "' does not exist.  Use add-entity function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to add relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as entity '" entity-name 
+                                                              "' does not exist.  Use add-entity function instead.")))
                        (some #{relation-name} relation-names)
-                       (throw (UnsupportedOperationException. (str "Unable to add relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as a relation with attribute-name '" 
-                                                                   entity-name "' exists.  Use modify-relation function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to add relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as a relation with attribute-name '" 
+                                                              entity-name "' exists.  Use modify-relation function instead.")))
                        (some #{relation-name} all-relation-names)
-                       (throw (UnsupportedOperationException. (str "Unable to add relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as a relation with attribute-name '" 
-                                                                   entity-name "' exists, either with the entity or on an entity it "
-                                                                   "extends.  Use modify-relation on the abstract entity the relation exists on.")))
+                       (throw (IllegalArgumentException. (str "Unable to add relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as a relation with attribute-name '" 
+                                                              entity-name "' exists, either with the entity or on an entity it "
+                                                              "extends.  Use modify-relation on the abstract entity the relation exists on.")))
                        :else
                        (swap! schema #(assoc-in % [:entities entity-name :relations] (conj (:relations entity) relation))))))
     
@@ -171,8 +184,8 @@
                   (let [entity (entity this entity-name)]
                     (cond
                        (nil? entity)
-                       (throw (UnsupportedOperationException. (str "Unable to modify entity '" entity-name ", as entity '" entity-name 
-                                                                   "' does not exist.  Use add-entity function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify entity '" entity-name ", as entity '" entity-name 
+                                                              "' does not exist.  Use add-entity function instead.")))
                        :else
                        (swap! schema #(update-in % [:entities entity-name] modifier-fn)))))
     (modify-attribute [this entity-name attribute-name modifier-fn]
@@ -180,17 +193,17 @@
                         attribute (get-in entity [:attributes attribute-name])]
                     (cond
                        (nil? entity)
-                       (throw (UnsupportedOperationException. (str "Unable to modify attribute with attribute-name '" attribute-name 
-                                                                   "' to entity '" entity-name ", as entity '" entity-name 
-                                                                   "' does not exist.  Use add-entity function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify attribute with attribute-name '" attribute-name 
+                                                              "' to entity '" entity-name ", as entity '" entity-name 
+                                                              "' does not exist.  Use add-entity function instead.")))
                        (nil? attribute)
-                       (throw (UnsupportedOperationException. (str "Unable to modify attribute with attribute-name '" attribute-name 
-                                                                   "' to entity '" entity-name ", as a attribute with attribute-name '" 
-                                                                   attribute-name "' does not exist.  Use add-attribute function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify attribute with attribute-name '" attribute-name 
+                                                              "' to entity '" entity-name ", as a attribute with attribute-name '" 
+                                                              attribute-name "' does not exist.  Use add-attribute function instead.")))
                        (not (fn? modifier-fn))
-                       (throw (UnsupportedOperationException. (str "Unable to modify attribute with attribute-name '" attribute-name 
-                                                                   "' to entity '" entity-name ", as modifier-fn is not a function."
-                                                                   "  Stop it.  Just stop it.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify attribute with attribute-name '" attribute-name 
+                                                              "' to entity '" entity-name ", as modifier-fn is not a function."
+                                                              "  Stop it.  Just stop it.")))
                        :else
                        (swap! schema #(update-in % [:entities entity-name :attributes attribute-name] modifier-fn)))))
     (modify-relation [this entity-name relation-name modifier-fn]
@@ -198,17 +211,17 @@
                         index (rels/find-relation-index (:relations entity) relation-name)]
                     (cond
                        (nil? entity)
-                       (throw (UnsupportedOperationException. (str "Unable to modify relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as entity '" entity-name 
-                                                                   "' does not exist.  Use add-entity function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as entity '" entity-name 
+                                                              "' does not exist.  Use add-entity function instead.")))
                        (nil? index)
-                       (throw (UnsupportedOperationException. (str "Unable to modify relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as a relation with attribute-name '" 
-                                                                   relation-name "' does not exist.  Use add-relation function instead.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as a relation with attribute-name '" 
+                                                              relation-name "' does not exist.  Use add-relation function instead.")))
                        (not (fn? modifier-fn))
-                       (throw (UnsupportedOperationException. (str "Unable to modify relation with attribute-name '" relation-name 
-                                                                   "' to entity '" entity-name ", as modifier-fn is not a function."
-                                                                   "  Stop it.  Just stop it.")))
+                       (throw (IllegalArgumentException. (str "Unable to modify relation with attribute-name '" relation-name 
+                                                              "' to entity '" entity-name ", as modifier-fn is not a function."
+                                                              "  Stop it.  Just stop it.")))
                        :else
                        (swap! schema #(update-in % [:entities entity-name :relations index] modifier-fn)))))
   (drop-entity [this entity-name] 
@@ -219,7 +232,45 @@
                     (swap! schema #(update-in % [:entities entity-name :attributes] (fn [m] (dissoc m attribute-name))))))
   (drop-relation [this entity-name relation-name]
                  (if (rels/find-relation (relations this entity-name) relation-name)
-                   (swap! schema #(update-in % [:entities entity-name :relations] (fn [coll] (rels/remove-relation coll relation-name)))))))
+                   (swap! schema #(update-in % [:entities entity-name :relations] (fn [coll] (rels/remove-relation coll relation-name))))))
+  (adhere [this entity-name data direction]
+          (if (not (some #{direction} [:in :out]))
+             (throw (IllegalArgumentException. "Direction must be either :in or :out.")))
+          (let [adhere-fn (if (= :out direction) common/adhere-out? common/adhere-in?)
+                attrs-fn (if (= :out direction) attrs/only-included attrs/only-persistable)
+                relas-fn (if (= :out direction) rels/only-included rels/only-persistable)]
+            (adhere- this entity-name data adhere-fn attrs-fn relas-fn)))
+  (adhere! [this entity-name data direction]
+           (if (not (some #{direction} [:in :out]))
+             (throw (IllegalArgumentException. "Direction must be either :in or :out.")))  
+           (let [adhere-fn (constantly true)
+                 attrs-fn (if (= :out direction) attrs/only-included attrs/only-persistable)
+                 relas-fn (if (= :out direction) rels/only-included rels/only-persistable)]
+            (adhere- this entity-name data adhere-fn attrs-fn relas-fn)))
+  
+  ISchemaInternals
+  (adhere- [this entity-name data adhere-fn attr-filter-fn rels-filter-fn]
+    (let [adhere? (adhere-fn (fidelity this entity-name))
+          attrs (if adhere? 
+                  (attr-filter-fn (attributes this entity-name))
+                  (attributes this entity-name))
+          relas (if adhere? 
+                  (rels-filter-fn  (relations this entity-name))
+                  (relations this entity-name))
+          fields (if adhere? 
+                   (select-keys data (concat (keys attrs) (rels/attribute-names relas)))
+                                data)]
+      (reduce (fn [data rel]
+                (let [name (rels/attribute-name rel)
+                      target (:related-to rel)
+                      value (get-in data [name])]
+                  (cond
+                    (map? value)
+                    (assoc data name (adhere- this target value adhere-fn attr-filter-fn rels-filter-fn))
+                    (coll? value)
+                    (assoc data name (into [] (map #(adhere- this target % adhere-fn attr-filter-fn rels-filter-fn) value)))
+                    :else
+                          data))) fields relas))))
 
 
 (defn create-schema

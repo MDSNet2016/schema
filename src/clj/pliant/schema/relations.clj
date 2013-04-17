@@ -98,6 +98,18 @@
   [relations]
   (if relations (filter (fn [relation] (not (true? (:required relation)))) relations)))
 
+; Need to revisit how omitted is determined
+(defn only-omitted
+  "Filters out any entity relations that are not omitted from response structures."
+  [relations]
+  (if relations (filter (fn [relation] (not (true? (:omit relation)))) relations)))
+
+
+(defn only-included
+  "Filters out any entity relations that are omitted from response structures."
+  [relations]
+  (if relations (filter (fn [relation] (not (true? (:omit relation)))) relations)))
+
 
 (defn belongs-to
   "Modifies a relation to be a :belongs-to type."

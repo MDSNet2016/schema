@@ -58,25 +58,56 @@
   (assoc spouse :fidelity :drunk))
 
 
-(defn strict?
-  "Checks if a schema or entity has a fidelity level of :strict."
+(defn divorce
+  "Removes the fidelity level from a schema or entity.  This really should 
+   only be used on entities, as the results of using it on the schema are  
+   not guaranteed to be supported."
   [spouse]
-  (= (:fidelity spouse) :strict))
+  (dissoc spouse :fidelity))
+
+(defn strict?
+  "Checks if the provided value has a fidelity level of :strict.  Value can 
+   be a map (schema or entity) or the level keyword."
+  [spouse-or-level]
+  (if (map? spouse-or-level)
+    (= (:fidelity spouse-or-level) :strict)
+    (= spouse-or-level :strict)))
 
 
 (defn strict-in?
-  "Checks if a schema or entity has a fidelity level of :strict-in."
-  [spouse]
-  (= (:fidelity spouse) :strict-in))
+  "Checks if the provided value has a fidelity level of :strict-in.  Value can 
+   be a map (schema or entity) or the level keyword."
+  [spouse-or-level]
+  (if (map? spouse-or-level)
+    (= (:fidelity spouse-or-level) :strict-in)
+    (= spouse-or-level :strict-in)))
 
 
 (defn strict-out?
-  "Checks if a schema or entity has a fidelity level of :strict-out."
-  [spouse]
-  (= (:fidelity spouse) :strict-out))
+  "Checks if the provided value has a fidelity level of :strict-out.  Value can 
+   be a map (schema or entity) or the level keyword."
+  [spouse-or-level]
+  (if (map? spouse-or-level)
+    (= (:fidelity spouse-or-level) :strict-out)
+    (= spouse-or-level :strict-out)))
 
 
 (defn drunk?
-  "Checks if a schema or entity has a fidelity level of :drunk."
-  [spouse]
-  (= (:fidelity spouse) :drunk))
+  "Checks if the provided value has a fidelity level of :drunk.  Value can 
+   be a map (schema or entity) or the level keyword."
+  [spouse-or-level]
+  (if (map? spouse-or-level)
+    (= (:fidelity spouse-or-level) :drunk)
+    (= spouse-or-level :drunk)))
+
+
+(defn adhere-in?
+  "Checks if the provided level indicates strict adherence for data that is to be persisted."
+  [spouse-or-level]
+  (or (strict? spouse-or-level) (strict-in? spouse-or-level)))
+
+
+(defn adhere-out?
+  "Checks if the provided level indicates strict adherence for data that is being retrieved."
+  [spouse-or-level]
+  (or (strict? spouse-or-level) (strict-out? spouse-or-level)))

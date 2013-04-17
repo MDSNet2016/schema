@@ -3092,7 +3092,13 @@ net.brehaut.ClojureTools = (function (SH) {
   (and relations (filter (fn [relation] (true? (:required relation))) relations)))</pre></td></tr><tr><td class="docs"><p>Filters out any entity relations that are required to be persisted to the datastore.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn only-optional
   [relations]
-  (if relations (filter (fn [relation] (not (true? (:required relation)))) relations)))</pre></td></tr><tr><td class="docs"><p>Modifies a relation to be a :belongs-to type.</p>
+  (if relations (filter (fn [relation] (not (true? (:required relation)))) relations)))</pre></td></tr><tr><td class="docs"><p>Filters out any entity relations that are not omitted from response structures.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn only-omitted
+  [relations]
+  (if relations (filter (fn [relation] (not (true? (:omit relation)))) relations)))</pre></td></tr><tr><td class="docs"><p>Filters out any entity relations that are omitted from response structures.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn only-included
+  [relations]
+  (if relations (filter (fn [relation] (not (true? (:omit relation)))) relations)))</pre></td></tr><tr><td class="docs"><p>Modifies a relation to be a :belongs-to type.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn belongs-to
   [relation]
   (assoc relation :type :belongs-to))</pre></td></tr><tr><td class="docs"><p>Modifies a relation to be a :has-many type.</p>
