@@ -11,9 +11,17 @@ TODO: write [great documentation](http://jacobian.org/writing/great-documentatio
                            :strict-out ;; only data that complies with the schema is returned when retrieved
                            :drunk ;; all data is persisted and retrieved, whether it complies to the schema or not
                         )
+             :create-strategy (or nil :default) ;; global create strategy hint
+             :retrieve-strategy (or nil :default :attributes :relations {}) ;; global retrieve strategy hint
+             :update-strategy (or nil :default) ;; global update strategy hint
+             :delete-strategy (or nil :default :deactivate :expire) ;; global delete strategy hint
              :entities {
                         :entity-name {
                                       :fidelity (or :strict :strict-in :strict-out :drunk nil) ;; entity specific fidelity that overrides the schema fidelity if present.
+                                      :create-strategy nil ;; entity specific create strategy hint, overrides global if set.
+                                      :retrieve-strategy nil ;; entity specific retrieve strategy hint, overrides global if set.
+                                      :update-strategy nil ;; entity specific update strategy hint, overrides global if set.
+                                      :delete-strategy nil ;; entity specific delete strategy hint, overrides global if set.
                                       :abstract false ;; if true then entity is defined as an abstract class.  No real rules around this yet.
                                       :extends [:entity-name1 :entity-name2] ;; collection of entity names that this entity extends.  applies to attributes and relations currently.
                                       :identity [:attribute-name1] ;; collection of attribute IDs that are treated as the identity.
@@ -39,12 +47,10 @@ TODO: write [great documentation](http://jacobian.org/writing/great-documentatio
                                                    :name :alt-to-node-name ;; the value of the map key this relationships values are stored in.  If not present, uses name of target node.
                                                    :transient false ;; Defines whether the data item on the data should be persisted to the database on create. 
                                                    :required true ;; If this relationship value must be defined to save the parent node.  ie - all data must belong to an organization for tenancy
-                                                   :strategy {
-                                                              :delete :? ;; determine if deletes are cascaded or not.  TBD
-                                                              :update :? ;; determine how updated data is handled on the related entity if provided in an update of this entity
-                                                              :create :? ;; determine how new data is handled on the related entity if provided in an create of this entity
-                                                              :retrieve :? ;; determine what information from this relationship is pulled when this entity is pulled.
-                                                             }
+                                                   :on-delete (or nil :ignore :cascade) ;; determine if deletes are cascaded or not.  TBD
+                                                   :on-update (or nil :ignore :cascade :cascade-update :cascade-create) ;; determine how updated data is handled on the related entity if provided in an update of this entity
+                                                   :on-create (or nil :ignore :cascade :cascade-update :cascade-create) ;; determine how new data is handled on the related entity if provided in an create of this entity
+                                                   :on-retrieve (or nil :ignore :cascade {}) ;; determine what information from this relationship is pulled when this entity is pulled.
                                                   }
                                                 ]
                                      }

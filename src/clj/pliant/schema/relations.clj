@@ -133,3 +133,90 @@
   "Modifies a relation to be a :many-to-many type."
   [relation]
   (assoc relation :type :many-to-many))
+
+(defn on-delete-cascade
+  "Modifies a relation to indicate that relative targets should 
+   be deleted when the parent entity is deleted."
+  [relation]
+  (assoc relation :on-delete :cascade))
+
+(defn on-delete-ignore
+  "Modifies a relation to that nothing should be done to entities 
+   associated through this relation when this entity is deleted."
+  [relation]
+  (dissoc relation :on-delete))
+
+(defn on-update-cascade
+  "Modifies a relation to indicate that relative targets should be
+   updated or created accordingly when the parent entity is updated 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has no values that represent its
+   IDENTITY, it would be considered a candidate for creation.  If it 
+   does have IDENTITY values, it is a candidate for update."
+  [relation]
+  (assoc relation :on-update :cascade))
+
+(defn on-update-cascade-create
+  "Modifies a relation to indicate that relative targets should be
+   created accordingly when the parent entity is updated 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has no values that represent its
+   IDENTITY, it would be considered a candidate for creation."
+  [relation]
+  (assoc relation :on-update :cascade-create))
+
+(defn on-update-cascade-update
+  "Modifies a relation to indicate that relative targets should be
+   updated accordingly when the parent entity is updated 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has IDENTITY values, it is a 
+   candidate for update."
+  [relation]
+  (assoc relation :on-update :cascade-update))
+
+(defn on-update-ignore
+  "Modifies a relation to that nothing should be done to entities 
+   associated through this relation when this entity is updated."
+  [relation]
+  (dissoc relation :on-update))
+
+(defn on-create-cascade
+  "Modifies a relation to indicate that relative targets should be
+   updated or created accordingly when the parent entity is created 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has no values that represent its
+   IDENTITY, it would be considered a candidate for creation.  If it 
+   does have IDENTITY values, it is a candidate for update."
+  [relation]
+  (assoc relation :on-update :cascade))
+
+(defn on-create-cascade-create
+  "Modifies a relation to indicate that relative targets should be
+   created accordingly when the parent entity is created 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has no values that represent its
+   IDENTITY, it would be considered a candidate for creation."
+  [relation]
+  (assoc relation :on-create :cascade-create))
+
+(defn on-create-cascade-update
+  "Modifies a relation to indicate that relative targets should be
+   updated accordingly when the parent entity is created 
+   and the data being updated has reference data to the relation. 
+   Generally, if the reference data has IDENTITY values, it is a 
+   candidate for update."
+  [relation]
+  (assoc relation :on-create :cascade-update))
+
+(defn on-create-ignore
+  "Modifies a relation to that nothing should be done to entities 
+   associated through this relation when this entity is created."
+  [relation]
+  (dissoc relation :on-create))
+
+(defn on-retrieve-ignore
+  "Modifies a relation to that nothing should be done to entities 
+   associated through this relation when this entity is deleted."
+  [relation]
+  (dissoc relation :on-retrieve))
+

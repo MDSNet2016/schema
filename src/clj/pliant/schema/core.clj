@@ -25,6 +25,8 @@
   "Defines the interface/protocol that makes up a Schema."
   (state [this]
           "Returns the current state of the schema.")
+  #_(finalize [this]
+          "Examines the current state of the schema, adjusting it to optimize usage.")
   (fidelity [this]
             [this entity-name]
             "Returns the level of fidelity the schema is requesting to be adhered to. 
