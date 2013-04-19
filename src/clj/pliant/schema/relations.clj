@@ -188,7 +188,7 @@
    IDENTITY, it would be considered a candidate for creation.  If it 
    does have IDENTITY values, it is a candidate for update."
   [relation]
-  (assoc relation :on-update :cascade))
+  (assoc relation :on-create :cascade))
 
 (defn on-create-cascade-create
   "Modifies a relation to indicate that relative targets should be

@@ -3,11 +3,28 @@
   (:use clojure.test
         pliant.schema.common))
 
+(deftest test-common-truths 
+  (is (strict? {:fidelity :strict}))
+  (is (strict-in? {:fidelity :strict-in}))
+  (is (strict-out? {:fidelity :strict-out}))
+  (is (drunk? {:fidelity :drunk}))
+  (is (strict? :strict))
+  (is (strict-in? :strict-in))
+  (is (strict-out? :strict-out))
+  (is (drunk? :drunk))
+  (is (not (strict? :not-a-real-level)))
+  (is (not (strict-in? :not-a-real-level)))
+  (is (not (strict-out? :not-a-real-level)))
+  (is (not (drunk? :not-a-real-level)))
+  (is (not (drunk? :not-a-real-level))))
+
+
 (deftest test-common-modifiers
   (is (true? (:required (required {:required false}))))
   (is (false? (:required (optional {:required true}))))
   (is (true? (:transient (transient {:transient false}))))
   (is (false? (:transient (persistable {:transient true}))))
+  
   (is (strict? (strict {:fidelity :not-a-real-level})))
   (is (not (strict-in? (strict {:fidelity :not-a-real-level}))))
   (is (not (strict-out? (strict {:fidelity :not-a-real-level}))))
@@ -24,11 +41,30 @@
   (is (not (strict-in? (drunk {:fidelity :not-a-real-level}))))
   (is (not (strict-out? (drunk {:fidelity :not-a-real-level}))))
   (is (drunk? (drunk {:fidelity :not-a-real-level})))
-  (is (strict? :strict))
-  (is (strict-in? :strict-in))
-  (is (strict-out? :strict-out))
-  (is (drunk? :drunk))
-  (is (not (strict? :not-a-real-level)))
-  (is (not (strict-in? :not-a-real-level)))
-  (is (not (strict-out? :not-a-real-level)))
-  (is (not (drunk? :not-a-real-level))))
+  (is (empty? (divorce {:fidelity :not-a-real-level}))))
+
+(deftest test-adherence
+  (is (adhere-in? (strict {:fidelity :not-a-real-level})))
+  (is (adhere-in? (strict-in {:fidelity :not-a-real-level})))
+  (is (not (adhere-in? (strict-out {:fidelity :not-a-real-level}))))
+  (is (not (adhere-in? (drunk {:fidelity :not-a-real-level}))))
+  (is (not (adhere-in? (divorce {:fidelity :not-a-real-level}))))
+  (is (adhere-out? (strict {:fidelity :not-a-real-level})))
+  (is (adhere-out? (strict-out {:fidelity :not-a-real-level})))
+  (is (not (adhere-out? (strict-in {:fidelity :not-a-real-level}))))
+  (is (not (adhere-out? (drunk {:fidelity :not-a-real-level}))))
+  (is (not (adhere-out? (divorce {:fidelity :not-a-real-level})))))
+
+(deftest test-strategies
+  (is (empty? (clear-delete {:delete-strategy :not-a-strategy})))
+  (is (= :default (:delete-strategy (default-delete {:delete-strategy :not-a-strategy}))))
+  (is (= :deactivate (:delete-strategy (deactivate-delete {:delete-strategy :not-a-strategy}))))
+  (is (= :expire (:delete-strategy (expire-delete {:delete-strategy :not-a-strategy}))))
+  (is (empty? (clear-update {:update-strategy :not-a-strategy})))
+  (is (= :default (:update-strategy (default-update {:update-strategy :not-a-strategy}))))
+  (is (empty? (clear-create {:create-strategy :not-a-strategy})))
+  (is (= :default (:create-strategy (default-create {:create-strategy :not-a-strategy}))))
+  (is (empty? (clear-retrieve {:retrieve-strategy :not-a-strategy})))
+  (is (= :default (:retrieve-strategy (default-retrieve {:retrieve-strategy :not-a-strategy}))))
+  (is (= :attributes (:retrieve-strategy (attributes-retrieve {:retrieve-strategy :not-a-strategy}))))
+  (is (= :relations (:retrieve-strategy (relations-retrieve {:retrieve-strategy :not-a-strategy})))))

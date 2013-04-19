@@ -89,3 +89,18 @@
 
 (deftest test-remove-relations
   (is (= 1 (count (remove-relation [belongs-to1 belongs-to2] :target)))))
+
+
+(deftest test-strategy-events
+  (is (empty? (on-delete-ignore {:on-delete :not-a-hint})))
+  (is (= :cascade (:on-delete (on-delete-cascade {:on-delete :not-a-hint}))))
+  (is (empty? (on-update-ignore {:on-update :not-a-hint})))
+  (is (= :cascade (:on-update (on-update-cascade {:on-update :not-a-hint}))))
+  (is (= :cascade-create (:on-update (on-update-cascade-create {:on-update :not-a-hint}))))
+  (is (= :cascade-update (:on-update (on-update-cascade-update {:on-update :not-a-hint}))))
+  (is (empty? (on-create-ignore {:on-create :not-a-hint})))
+  (is (= :cascade (:on-create (on-create-cascade {:on-create :not-a-hint}))))
+  (is (= :cascade-create (:on-create (on-create-cascade-create {:on-create :not-a-hint}))))
+  (is (= :cascade-update (:on-create (on-create-cascade-update {:on-create :not-a-hint}))))
+  (is (empty? (on-retrieve-ignore {:on-retrieve :not-a-hint}))))
+
