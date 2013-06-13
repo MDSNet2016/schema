@@ -15,4 +15,4 @@
   :plugins [[lein-marginalia "0.7.1"]]
   :aliases {"doc" ["marg" "-d" "doc/api" "-m"]}
 
-  :dependencies [[org.clojure/clojure "1.3.0"]])
+  :dependencies [[org.clojure/clojure "1.4.0"]])
